@@ -1,3 +1,8 @@
+2024/02/15  
+I need to learn how to return a pointer or null/void to the caller, especially when it is being used within this interop situation.  
+Until then, this repo should be closed.  
+
+
 # Dart Zig Interop
 
 There are some examples for Dart and C FFI:
