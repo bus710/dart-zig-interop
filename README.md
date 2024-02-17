@@ -23,4 +23,15 @@ $ dart pub get
 $ dart run hello.dart
 ```
 
+For the primitives example:
+```sh
+# Test and build the library
+$ cd src/02-primitives/primitives_library
+$ zig run primitives.zig
+$ zig build-lib -dynamic primitives.zig
 
+# Install packages and run the caller
+$ cd src/02-primitives
+$ dart pub get
+$ dart run primitives.dart
+```
