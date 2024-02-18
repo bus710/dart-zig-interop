@@ -4,16 +4,6 @@ var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 var allocator = gpa.allocator();
 
 pub fn main() void {
-    // std.debug.print("3 + 5 = {d}\n", .{sum(3, 5)});
-    //
-    // const mult: *i64 = multiply(3, 5);
-    // std.debug.print("3 * 5 = {d}\n", .{mult.*});
-    //
-    // free_pointer(mult);
-    //
-    // var sub_num: i64 = 3;
-    // std.debug.print("3 - 5 = {d}\n", .{subtract(&sub_num, 5)});
-
     std.debug.print("{s}\n", .{hello_world()});
 
     const backwards = "backwards";
@@ -37,10 +27,11 @@ export fn reverse(ptr: *const []u8, length: u32) callconv(.C) *[]u8 {
         reversed_str[length - i - 1] = ptr.*[i];
     }
 
-    // i = 0;
-    // while (i < length) : (i += 1) {
-    //     std.debug.print("{d}, {c}, {c} \n", .{ i, ptr.*[i], reversed_str[i] });
-    // }
+    // Just to show
+    i = 0;
+    while (i < length) : (i += 1) {
+        std.debug.print("{d}, {c}, {c} \n", .{ i, ptr.*[i], reversed_str[i] });
+    }
 
     return &reversed_str;
 }
