@@ -52,6 +52,10 @@ typedef CreatePlace = Place Function(
 typedef DistanceNative = Double Function(Coordinate p1, Coordinate p2);
 typedef Distance = double Function(Coordinate p1, Coordinate p2);
 
+// C function: char *reverse(char *str)
+typedef PrintNameNative = Pointer<Utf8> Function(Pointer<Utf8> str);
+typedef PrintName = Pointer<Utf8> Function(Pointer<Utf8> str);
+
 void main() {
   // Open the dynamic library
   var libraryPath =
@@ -90,12 +94,23 @@ void main() {
   print(
       'Coordinate is lat ${coordinate.latitude}, long ${coordinate.longitude}');
 
+//
+  final myHome = 'My Home'.toNativeUtf8();
+  final printName =
+      dylib.lookupFunction<PrintNameNative, PrintName>('print_name');
+  final printName2 = printName(myHome).toDartString();
+  print("=> ${printName2}");
+
+  calloc.free(myHome);
+//
+
   final myHomeUtf8 = 'My Home'.toNativeUtf8();
   final createPlace =
       dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
   final place = createPlace(myHomeUtf8, 42.0, 24.0);
   final name = place.name.toDartString();
   calloc.free(myHomeUtf8);
+
   final coord = place.coordinate;
   print(
       'The name of my place is $name at ${coord.latitude}, ${coord.longitude}');

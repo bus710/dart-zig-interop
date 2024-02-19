@@ -97,3 +97,10 @@ export fn distance(c1: Coordinate, c2: Coordinate) f64 {
 
     return std.math.sqrt(xd * xd + yd * yd);
 }
+
+export fn print_name(name: [*]const u8) callconv(.C) [*:0]u8 {
+    std.debug.print(">>> {any}\n", .{name});
+    const printable: [*:0]const u8 = @ptrCast(name);
+    std.debug.print(">>> {s}\n", .{printable});
+    return @constCast(printable);
+}

@@ -27,3 +27,4 @@ doc/api/
 .flutter-plugins-dependencies
 
 *.so*
+src/03-structs/.vscode/launch.json
