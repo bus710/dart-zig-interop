@@ -4,6 +4,9 @@ var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 var allocator = gpa.allocator();
 
 pub fn main() void {
+    // check for leaks
+    defer std.debug.assert(gpa.deinit() == .ok);
+
     std.debug.print("3 + 5 = {d}\n", .{sum(3, 5)});
 
     const mult: *i64 = multiply(3, 5);
