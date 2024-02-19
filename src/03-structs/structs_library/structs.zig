@@ -15,7 +15,7 @@ const Place = extern struct {
 
 pub fn main() !void {
     std.debug.print("{s}\n", .{hello_world()});
-    std.debug.print("{s}\n", .{hello_world_slice().*});
+    std.debug.print("{s}\n", .{hello_world_slice()});
 
     // check for leaks
     defer std.debug.assert(gpa.deinit() == .ok);
@@ -40,13 +40,16 @@ pub fn main() !void {
     return;
 }
 
-export fn hello_world() *const [11:0]u8 {
-    return "Hello World";
+export fn hello_world() [*:0]u8 {
+    const hello = "Hello World";
+    const slice = hello[0..hello.len];
+    return @constCast(slice);
 }
 
-export fn hello_world_slice() callconv(.C) *[]const u8 {
-    var hello_slice: []const u8 = "Hello World from Slice"[0..22];
-    return &hello_slice;
+export fn hello_world_slice() callconv(.C) [*:0]u8 {
+    const hello = "Hello World from Slice";
+    const slice = hello[0..hello.len];
+    return @constCast(slice);
 }
 
 //
