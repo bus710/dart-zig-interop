@@ -3,13 +3,39 @@ const std = @import("std");
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 var allocator = gpa.allocator();
 
-pub fn main() void {
+const Coordinate = extern struct {
+    latitude: f64,
+    longitude: f64,
+};
+
+const Place = extern struct {
+    name: [*]const u8,
+    coordinate: Coordinate,
+};
+
+pub fn main() !void {
     std.debug.print("{s}\n", .{hello_world()});
+    std.debug.print("{s}\n", .{hello_world_slice().*});
+
+    // check for leaks
+    defer std.debug.assert(gpa.deinit() == .ok);
 
     const backwards = "backwards";
-    const backwards_copy = allocator.dupe(u8, backwards) catch undefined;
-    const reversed = reverse(&backwards_copy, 9);
-    std.debug.print("{s} reversed is {s}\n", .{ backwards, reversed.* });
+    const reversed_ptr = reverse(backwards, backwards.len) orelse {
+        std.debug.print("failed to allocate reversed string\n", .{});
+        return error.OutOfMemory;
+    };
+    defer free_string(reversed_ptr);
+
+    const reversed = std.mem.span(reversed_ptr);
+    std.debug.print("{s} reversed is {s}\n", .{ backwards, reversed });
+
+    const coord: *Coordinate = create_coordinate(3.5, 4.6);
+    std.debug.print("Coordinate is lat {d:.2}, long {d:.2}\n", .{ coord.latitude, coord.longitude });
+
+    const place: *Place = create_place("My Home", 42.0, 24.0);
+    const printable: [*:0]const u8 = @ptrCast(place.name);
+    std.debug.print("The name of my place is {s} at {d:.2}, {d:.2}\n", .{ printable, place.coordinate.latitude, place.coordinate.longitude });
 
     return;
 }
@@ -18,51 +44,53 @@ export fn hello_world() *const [11:0]u8 {
     return "Hello World";
 }
 
-export fn reverse(ptr: *const []u8, length: u32) callconv(.C) *[]u8 {
-    var reversed_str = allocator.alloc(u8, length + 1) catch undefined;
-    if (&reversed_str[0] == undefined) return undefined;
+export fn hello_world_slice() callconv(.C) *[]const u8 {
+    var hello_slice: []const u8 = "Hello World from Slice"[0..22];
+    return &hello_slice;
+}
 
-    var i: u8 = 0;
-    while (i < length) : (i += 1) {
-        reversed_str[length - i - 1] = ptr.*[i];
+//
+fn reverse_zig(input: []const u8) ![:0]u8 {
+    // It seems like you want this to be a NUL-terminated string
+    var reversed_str = try allocator.allocSentinel(u8, input.len, 0);
+    var i: usize = 0;
+    while (i < input.len) : (i += 1) {
+        reversed_str[input.len - i - 1] = input[i];
     }
-
-    // Just to show
-    i = 0;
-    while (i < length) : (i += 1) {
-        std.debug.print("{d}, {c}, {c} \n", .{ i, ptr.*[i], reversed_str[i] });
-    }
-
-    return &reversed_str;
+    return reversed_str;
 }
 
-//
-//
-//
-//
-//
-//
-//
-//
-
-export fn sum(a: i64, b: i64) i64 {
-    return a + b;
+/// returns `null` on allocation failure
+export fn reverse(ptr: [*]const u8, length: u32) callconv(.C) ?[*:0]u8 {
+    const slice = ptr[0..length];
+    return reverse_zig(slice) catch return null;
 }
 
-export fn multiply(a: i64, b: i64) callconv(.C) *i64 {
-    var mult = allocator.alloc(i64, 1) catch undefined;
-    mult[0] = a * b;
-    return &mult[0];
+export fn free_string(ptr: [*:0]u8) void {
+    const slice = std.mem.span(ptr);
+    allocator.free(slice);
 }
 
-export fn free_pointer(ptr: *i64) void {
-    if (ptr == undefined) {
-        return;
-    }
-    const p: *[1]i64 = ptr;
-    allocator.free(p);
+export fn create_coordinate(latitude: f64, longitude: f64) callconv(.C) *Coordinate {
+    var coordinate = Coordinate{
+        .latitude = latitude,
+        .longitude = longitude,
+    };
+    return &coordinate;
 }
 
-export fn subtract(a: *i64, b: i64) i64 {
-    return a.* - b;
+export fn create_place(name: [*]const u8, latitude: f64, longitude: f64) callconv(.C) *Place {
+    var place = Place{
+        .name = name,
+        .coordinate = create_coordinate(latitude, longitude).*,
+    };
+
+    return &place;
+}
+
+export fn distance(c1: Coordinate, c2: Coordinate) f64 {
+    const xd = c2.latitude - c1.latitude;
+    const yd = c2.longitude - c1.longitude;
+
+    return std.math.sqrt(xd * xd + yd * yd);
 }
