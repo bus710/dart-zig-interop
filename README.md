@@ -1,3 +1,11 @@
+Problem: currently the `toDartString` gets panicked.  
+It seems like there is some pointer address issue in FFI.
+
+<br/>
+<br/>
+<br/>
+<br/>
+
 # Dart Zig Interop
 
 There are some examples for Dart and C FFI:
