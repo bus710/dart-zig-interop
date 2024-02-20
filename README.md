@@ -1,7 +1,6 @@
 # Dart Zig Interop
 
-:exclamation: Caution: currently the `toDartString` gets panicked if it is executed against to Zig struct (Getting a Zig string doesn't have any problem).  
-It seems like there is some pointer address issue in Dart FFI.
+:exclamation: Caution: currently the `toDartString` gets panicked if it is executed against to a string included in Zig struct (Getting a Zig string doesn't have any problem). It seems like there is some pointer address issue in Dart FFI.
 
 <br/>
 <br/>
@@ -10,7 +9,11 @@ There are some examples for Dart and C FFI:
 - https://dart.dev/interop/c-interop
 - https://github.com/dart-lang/samples/ffi
 
-This repo repeats the examples, but for Dart and Zig FFI.
+This repo repeats the same as the examples, but for Dart and Zig FFI.
+
+Used versions as of Feb 2024:
+- Zig SDK: 0.12.0-dev.2250
+- Dart SDK: 3.4.0-00.0.dev
 
 <br/>
 
