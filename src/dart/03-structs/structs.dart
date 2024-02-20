@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:ffi';
-import 'dart:io' show Directory, Platform, sleep;
+import 'dart:io' show Directory, Platform;
 
 import 'package:ffi/ffi.dart';
 import 'package:path/path.dart' as path;
@@ -43,10 +43,6 @@ typedef CreateCoordinateNative = Coordinate Function(
 typedef CreateCoordinate = Coordinate Function(
     double latitude, double longitude);
 
-// C function: char *reverse(char *str)
-typedef PrintNameNative = Pointer<Utf8> Function(Pointer<Utf8> str);
-typedef PrintName = Pointer<Utf8> Function(Pointer<Utf8> str);
-
 // C function: struct Place create_place(char *name, double latitude, double longitude)
 typedef CreatePlaceNative = Place Function(
     Pointer<Utf8> name, Double latitude, Double longitude);
@@ -60,19 +56,12 @@ void main() {
   // Open the dynamic library
   var libraryPath =
       path.join(Directory.current.path, '../../library/zig-out/lib', 'libstructs.so');
-
   final dylib = DynamicLibrary.open(libraryPath);
-
-  //
-  //
 
   final helloWorld =
       dylib.lookupFunction<HelloWorld, HelloWorld>('hello_world');
   final message = helloWorld().toDartString();
   print(message);
-
-  //
-  //
 
   final reverse = dylib.lookupFunction<ReverseNative, Reverse>('reverse');
   final backwards = 'backwards';
@@ -82,15 +71,9 @@ void main() {
   calloc.free(backwardsUtf8);
   print('$backwards reversed is $reversedMessage');
 
-  //
-  //
-
   final freeString =
       dylib.lookupFunction<FreeStringNative, FreeString>('free_string');
   freeString(reversedMessageUtf8);
-
-  //
-  //
 
   final createCoordinate =
       dylib.lookupFunction<CreateCoordinateNative, CreateCoordinate>(
@@ -99,35 +82,15 @@ void main() {
   print(
       'Coordinate is lat ${coordinate.latitude}, long ${coordinate.longitude}');
 
-  //
-  //
-
-  final myHome = 'My Home 1'.toNativeUtf8();
-  final printName =
-      dylib.lookupFunction<PrintNameNative, PrintName>('print_name');
-  final printNameString = printName(myHome).toDartString();
-  print("=> ${printNameString}");
-  calloc.free(myHome);
-
-  print("");
-  //
-  //
-
-  final myHome2 = 'My Home 2'.toNativeUtf8();
+  final myHomeUtf8 = 'My Home'.toNativeUtf8();
   final createPlace =
       dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
-  final place = createPlace(myHome, 42.0, 24.0);
-  print("=> ${place.name}");
-
+  final place = createPlace(myHomeUtf8, 42.0, 24.0);
   final name = place.name.toDartString();
-  calloc.free(myHome2);
-
-  print("");
-  //
-  //
-
+  calloc.free(myHomeUtf8);
   final coord = place.coordinate;
-  print('The place (${name}) is at ${coord.latitude}, ${coord.longitude}');
+  print(
+      'The name of my place is $name at ${coord.latitude}, ${coord.longitude}');
   final distance = dylib.lookupFunction<DistanceNative, Distance>('distance');
   final dist = distance(createCoordinate(2.0, 2.0), createCoordinate(5.0, 6.0));
   print("distance between (2,2) and (5,6) = $dist");
