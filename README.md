@@ -1,8 +1,6 @@
-Problem: currently the `toDartString` gets panicked if it is executed against to Zig struct (Zig string doesn't have any problem).  
-It seems like there is some pointer address issue in FFI.
+Caution: currently the `toDartString` gets panicked if it is executed against to Zig struct (Getting a Zig string doesn't have any problem).  
+It seems like there is some pointer address issue in Dart FFI.
 
-<br/>
-<br/>
 <br/>
 <br/>
 
@@ -18,13 +16,14 @@ This repo repeats the examples, but for Dart and Zig FFI.
 
 ## How to run
 
-For the hello world example:
+To build all the Zig libraries:
 ```sh
 # Test and build the library
 $ cd src/library
 $ zig build --summary all
 ```
 
+For the hello world example:
 ```sh
 # Install packages and run the caller
 $ cd src/dart/01-hello-world
