@@ -108,10 +108,3 @@ export fn print_name(name: [*]const u8) callconv(.C) [*:0]u8 {
     std.debug.print("zig => {s}\n", .{printable});
     return @constCast(printable);
 }
-
-export fn print_name2(name: [*]const u8) callconv(.C) [*:0]u8 {
-    std.debug.print("zig => {any}\n", .{name});
-    const printable: [*:0]const u8 = @ptrCast(name);
-    std.debug.print("zig => {s}\n", .{printable});
-    return @constCast(printable);
-}
