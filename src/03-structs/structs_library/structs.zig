@@ -83,6 +83,10 @@ export fn create_coordinate(latitude: f64, longitude: f64) callconv(.C) *Coordin
 }
 
 export fn create_place(name: [*]const u8, latitude: f64, longitude: f64) callconv(.C) *Place {
+    std.debug.print("zig => {any}\n", .{name});
+    const printable: [*:0]const u8 = @ptrCast(name);
+    std.debug.print("zig => {s}\n", .{printable});
+
     var place = Place{
         .name = name,
         .coordinate = create_coordinate(latitude, longitude).*,
@@ -99,8 +103,15 @@ export fn distance(c1: Coordinate, c2: Coordinate) f64 {
 }
 
 export fn print_name(name: [*]const u8) callconv(.C) [*:0]u8 {
-    std.debug.print(">>> {any}\n", .{name});
+    std.debug.print("zig => {any}\n", .{name});
     const printable: [*:0]const u8 = @ptrCast(name);
-    std.debug.print(">>> {s}\n", .{printable});
+    std.debug.print("zig => {s}\n", .{printable});
+    return @constCast(printable);
+}
+
+export fn print_name2(name: [*]const u8) callconv(.C) [*:0]u8 {
+    std.debug.print("zig => {any}\n", .{name});
+    const printable: [*:0]const u8 = @ptrCast(name);
+    std.debug.print("zig => {s}\n", .{printable});
     return @constCast(printable);
 }

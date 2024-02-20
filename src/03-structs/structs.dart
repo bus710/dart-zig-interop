@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:ffi';
-import 'dart:io' show Directory, Platform;
+import 'dart:io' show Directory, Platform, sleep;
 
 import 'package:ffi/ffi.dart';
 import 'package:path/path.dart' as path;
@@ -43,18 +43,21 @@ typedef CreateCoordinateNative = Coordinate Function(
 typedef CreateCoordinate = Coordinate Function(
     double latitude, double longitude);
 
-// C function: struct Place create_place(char *name, double latitude, double longitude)
-typedef CreatePlaceNative = Place Function(
-    Pointer<Utf8> name, Double latitude, Double longitude);
-typedef CreatePlace = Place Function(
-    Pointer<Utf8> name, double latitude, double longitude);
-
-typedef DistanceNative = Double Function(Coordinate p1, Coordinate p2);
-typedef Distance = double Function(Coordinate p1, Coordinate p2);
-
 // C function: char *reverse(char *str)
 typedef PrintNameNative = Pointer<Utf8> Function(Pointer<Utf8> str);
 typedef PrintName = Pointer<Utf8> Function(Pointer<Utf8> str);
+
+// C function: struct Place create_place(char *name, double latitude, double longitude)
+// typedef CreatePlaceNative = Place Function(
+//     Pointer<Utf8> name, Double latitude, Double longitude);
+// typedef CreatePlace = Place Function(
+//     Pointer<Utf8> name, double latitude, double longitude);
+
+typedef CreatePlaceNative = Place Function(Pointer<Utf8> name);
+typedef CreatePlace = Place Function(Pointer<Utf8> name);
+
+typedef DistanceNative = Double Function(Coordinate p1, Coordinate p2);
+typedef Distance = double Function(Coordinate p1, Coordinate p2);
 
 void main() {
   // Open the dynamic library
@@ -70,10 +73,16 @@ void main() {
   }
   final dylib = DynamicLibrary.open(libraryPath);
 
+  //
+  //
+
   final helloWorld =
       dylib.lookupFunction<HelloWorld, HelloWorld>('hello_world');
   final message = helloWorld().toDartString();
   print(message);
+
+  //
+  //
 
   final reverse = dylib.lookupFunction<ReverseNative, Reverse>('reverse');
   final backwards = 'backwards';
@@ -83,9 +92,15 @@ void main() {
   calloc.free(backwardsUtf8);
   print('$backwards reversed is $reversedMessage');
 
+  //
+  //
+
   final freeString =
       dylib.lookupFunction<FreeStringNative, FreeString>('free_string');
   freeString(reversedMessageUtf8);
+
+  //
+  //
 
   final createCoordinate =
       dylib.lookupFunction<CreateCoordinateNative, CreateCoordinate>(
@@ -94,26 +109,47 @@ void main() {
   print(
       'Coordinate is lat ${coordinate.latitude}, long ${coordinate.longitude}');
 
-//
-  final myHome = 'My Home'.toNativeUtf8();
+  //
+  //
+
+  final myHome = 'My Home 1'.toNativeUtf8();
   final printName =
       dylib.lookupFunction<PrintNameNative, PrintName>('print_name');
-  final printName2 = printName(myHome).toDartString();
-  print("=> ${printName2}");
-
+  final printNameString = printName(myHome).toDartString();
+  print("=> ${printNameString}");
   calloc.free(myHome);
-//
 
-  final myHomeUtf8 = 'My Home'.toNativeUtf8();
+  print("");
+  //
+  //
+
+  final myHome2 = 'My Home 2'.toNativeUtf8();
+  final printName2 =
+      dylib.lookupFunction<PrintNameNative, PrintName>('print_name2');
+  final printNameString2 = printName2(myHome2).toDartString();
+  print("=> ${printNameString2}");
+  calloc.free(myHome2);
+
+  print("");
+  //
+  //
+
+  final myHome3 = 'My Home 3'.toNativeUtf8();
   final createPlace =
       dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
-  final place = createPlace(myHomeUtf8, 42.0, 24.0);
-  final name = place.name.toDartString();
-  calloc.free(myHomeUtf8);
+  // final place = createPlace(myHome, 42.0, 24.0);
+  final place = createPlace(myHome3);
+  print("=> ${place.name}");
+
+  // final name = place.name.toDartString();
+  calloc.free(myHome3);
+
+  print("");
+  //
+  //
 
   final coord = place.coordinate;
-  print(
-      'The name of my place is $name at ${coord.latitude}, ${coord.longitude}');
+  print('The place is at ${coord.latitude}, ${coord.longitude}');
   final distance = dylib.lookupFunction<DistanceNative, Distance>('distance');
   final dist = distance(createCoordinate(2.0, 2.0), createCoordinate(5.0, 6.0));
   print("distance between (2,2) and (5,6) = $dist");
