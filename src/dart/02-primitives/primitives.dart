@@ -35,17 +35,8 @@ typedef FreePointer = void Function(Pointer<Int32> a);
 
 void main() {
   // Open the dynamic library
-  var libraryPath = path.join(
-      Directory.current.path, 'primitives_library', 'libprimitives.so');
-  if (Platform.isMacOS) {
-    libraryPath = path.join(
-        Directory.current.path, 'primitives_library', 'libprimitives.dylib');
-  }
-  if (Platform.isWindows) {
-    libraryPath = path.join(
-        Directory.current.path, 'primitives_library', 'Debug', 'primtives.dll');
-  }
-
+  var libraryPath =
+      path.join(Directory.current.path, '../../library/zig-out/lib', 'libprimitives.so');
   final dylib = DynamicLibrary.open(libraryPath);
 
   // calls int sum(int a, int b);

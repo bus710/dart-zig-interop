@@ -48,13 +48,10 @@ typedef PrintNameNative = Pointer<Utf8> Function(Pointer<Utf8> str);
 typedef PrintName = Pointer<Utf8> Function(Pointer<Utf8> str);
 
 // C function: struct Place create_place(char *name, double latitude, double longitude)
-// typedef CreatePlaceNative = Place Function(
-//     Pointer<Utf8> name, Double latitude, Double longitude);
-// typedef CreatePlace = Place Function(
-//     Pointer<Utf8> name, double latitude, double longitude);
-
-typedef CreatePlaceNative = Place Function(Pointer<Utf8> name);
-typedef CreatePlace = Place Function(Pointer<Utf8> name);
+typedef CreatePlaceNative = Place Function(
+    Pointer<Utf8> name, Double latitude, Double longitude);
+typedef CreatePlace = Place Function(
+    Pointer<Utf8> name, double latitude, double longitude);
 
 typedef DistanceNative = Double Function(Coordinate p1, Coordinate p2);
 typedef Distance = double Function(Coordinate p1, Coordinate p2);
@@ -62,15 +59,8 @@ typedef Distance = double Function(Coordinate p1, Coordinate p2);
 void main() {
   // Open the dynamic library
   var libraryPath =
-      path.join(Directory.current.path, 'structs_library', 'libstructs.so');
-  if (Platform.isMacOS) {
-    libraryPath = path.join(
-        Directory.current.path, 'structs_library', 'libstructs.dylib');
-  }
-  if (Platform.isWindows) {
-    libraryPath = path.join(
-        Directory.current.path, 'structs_library', 'Debug', 'structs.dll');
-  }
+      path.join(Directory.current.path, '../../library/zig-out/lib', 'libstructs.so');
+
   final dylib = DynamicLibrary.open(libraryPath);
 
   //
@@ -124,32 +114,20 @@ void main() {
   //
 
   final myHome2 = 'My Home 2'.toNativeUtf8();
-  final printName2 =
-      dylib.lookupFunction<PrintNameNative, PrintName>('print_name2');
-  final printNameString2 = printName2(myHome2).toDartString();
-  print("=> ${printNameString2}");
+  final createPlace =
+      dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
+  final place = createPlace(myHome, 42.0, 24.0);
+  print("=> ${place.name}");
+
+  final name = place.name.toDartString();
   calloc.free(myHome2);
 
   print("");
   //
   //
 
-  final myHome3 = 'My Home 3'.toNativeUtf8();
-  final createPlace =
-      dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
-  // final place = createPlace(myHome, 42.0, 24.0);
-  final place = createPlace(myHome3);
-  print("=> ${place.name}");
-
-  // final name = place.name.toDartString();
-  calloc.free(myHome3);
-
-  print("");
-  //
-  //
-
   final coord = place.coordinate;
-  print('The place is at ${coord.latitude}, ${coord.longitude}');
+  print('The place (${name}) is at ${coord.latitude}, ${coord.longitude}');
   final distance = dylib.lookupFunction<DistanceNative, Distance>('distance');
   final dist = distance(createCoordinate(2.0, 2.0), createCoordinate(5.0, 6.0));
   print("distance between (2,2) and (5,6) = $dist");
