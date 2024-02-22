@@ -45,9 +45,9 @@ typedef CreateCoordinate = Coordinate Function(
 
 // C function: struct Place create_place(char *name, double latitude, double longitude)
 typedef CreatePlaceNative = Place Function(
-    Pointer<Utf8> dummy, Pointer<Utf8> name, Double latitude, Double longitude);
+    Pointer<Char> dummy, Pointer<Char> name, Double latitude, Double longitude);
 typedef CreatePlace = Place Function(
-    Pointer<Utf8> dummy, Pointer<Utf8> name, double latitude, double longitude);
+    Pointer<Char> dummy, Pointer<Char> name, double latitude, double longitude);
 
 typedef DistanceNative = Double Function(Coordinate p1, Coordinate p2);
 typedef Distance = double Function(Coordinate p1, Coordinate p2);
@@ -85,7 +85,7 @@ void main() {
   print(
       'Coordinate is lat ${coordinate.latitude}, long ${coordinate.longitude}');
 
-  final myHomeUtf8 = 'AAA'.toNativeUtf8();
+  final myHomeUtf8 = 'BBB'.toNativeUtf8().cast<Char>();
 
   final printName =
       dylib.lookupFunction<PrintNameNative, PrintName>('print_name');
@@ -95,10 +95,13 @@ void main() {
 
   final createPlace =
       dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
-  final place = createPlace(myHomeUtf8, myHomeUtf8, 43.0, 24.0);
+  final place = createPlace(myHomeUtf8, myHomeUtf8, 1.0, 2.0);
 
-  print("++ " + place.name.toDartString());
-  final name = place.name.toDartString();
+  var name2 = place.name.cast<Char>();
+  print(name2.value.toString());
+
+  print("++ " + place.name.toDartString(length: 2));
+  final name = place.name.toDartString(length: 2);
 
   calloc.free(myHomeUtf8);
 
