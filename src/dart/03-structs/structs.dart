@@ -85,7 +85,7 @@ void main() {
   print(
       'Coordinate is lat ${coordinate.latitude}, long ${coordinate.longitude}');
 
-  final myHomeUtf8 = 'BBB'.toNativeUtf8().cast<Char>();
+  final myHomeUtf8 = 'ABB'.toNativeUtf8().cast<Char>();
 
   final printName =
       dylib.lookupFunction<PrintNameNative, PrintName>('print_name');
@@ -97,8 +97,8 @@ void main() {
       dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
   final place = createPlace(myHomeUtf8, myHomeUtf8, 1.0, 2.0);
 
-  var name2 = place.name.cast<Char>();
-  print(name2.value.toString());
+  var name2 = place.name.toString();
+  print(name2);
 
   print("++ " + place.name.toDartString(length: 2));
   final name = place.name.toDartString(length: 2);
