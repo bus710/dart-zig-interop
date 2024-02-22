@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:ffi';
+import 'dart:typed_data';
 import 'dart:io' show Directory;
 
 import 'package:ffi/ffi.dart';
@@ -22,6 +23,13 @@ final class Place extends Struct {
   external Coordinate coordinate;
   external Pointer<Utf8> dummy;
   external Pointer<Utf8> name;
+}
+
+// Example of a complex struct (contains an array of 8 uint8 and a nested struct)
+final class MyList extends Struct {
+  external Coordinate coordinate;
+
+  external Pointer<Uint8> array;
 }
 
 // C function: char *hello_world();
@@ -45,9 +53,15 @@ typedef CreateCoordinate = Coordinate Function(
 
 // C function: struct Place create_place(char *name, double latitude, double longitude)
 typedef CreatePlaceNative = Place Function(
-    Pointer<Char> dummy, Pointer<Char> name, Double latitude, Double longitude);
+    Array<Uint8> dummy, Pointer<Char> name, Double latitude, Double longitude);
 typedef CreatePlace = Place Function(
     Pointer<Char> dummy, Pointer<Char> name, double latitude, double longitude);
+
+typedef CreateListNative = MyList Function(
+    Pointer<Uint8> array ,  Double latitude, Double longitude);
+typedef CreateList= MyList Function(
+    Pointer<Uint8> array, double latitude, double longitude);
+
 
 typedef DistanceNative = Double Function(Coordinate p1, Coordinate p2);
 typedef Distance = double Function(Coordinate p1, Coordinate p2);
@@ -85,7 +99,7 @@ void main() {
   print(
       'Coordinate is lat ${coordinate.latitude}, long ${coordinate.longitude}');
 
-  final myHomeUtf8 = 'ABB'.toNativeUtf8().cast<Char>();
+  // final myHomeUtf8 = 'ABB'.toNativeUtf8().cast<Char>();
 
   final printName =
       dylib.lookupFunction<PrintNameNative, PrintName>('print_name');
@@ -93,22 +107,48 @@ void main() {
   printName("printName".toNativeUtf8());
   printName("printName".toNativeUtf8());
 
-  final createPlace =
-      dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
-  final place = createPlace(myHomeUtf8, myHomeUtf8, 1.0, 2.0);
 
-  var name2 = place.name.toString();
-  print(name2);
+  // https://github.com/dart-archive/ffi/issues/127
+  final array = Uint8List.fromList([0,0,1,0]);
 
-  print("++ " + place.name.toDartString(length: 2));
-  final name = place.name.toDartString(length: 2);
+  final length = array.length;
+  final pointer = calloc<Uint8>(length + 1); // +1 if null-terminated.
+  for (int index = 0; index < length; index++) {
+    pointer[index] = array[index];
+  }
 
-  calloc.free(myHomeUtf8);
+  final createList =
+      dylib.lookupFunction<CreateListNative, CreateList>('create_list');
+  final list = createList(pointer, 1.0, 2.0);
 
-  final coord = place.coordinate;
-  print(
-      'The name of my place is $name at ${coord.latitude}, ${coord.longitude}');
-  final distance = dylib.lookupFunction<DistanceNative, Distance>('distance');
-  final dist = distance(createCoordinate(2.0, 2.0), createCoordinate(5.0, 6.0));
-  print("distance between (2,2) and (5,6) = $dist");
+  list.array;
+
+  for(int index = 0; index < length; index++){
+    array[index] = list.array[index];
+  }
+
+  print(array);
+  print(array);
+
+  //
+
+  // final createPlace =
+  //     dylib.lookupFunction<CreatePlaceNative, CreatePlace>('create_place');
+  // final place = createPlace(myHomeUtf8, myHomeUtf8, 1.0, 2.0);
+  //
+  // var name2 = place.name.toString();
+  // print(name2);
+  //
+  // print("++ " + place.name.toDartString(length: 2));
+  // final name = place.name.toDartString(length: 2);
+
+  // var name = myHomeUtf8;
+  // calloc.free(myHomeUtf8);
+  //
+  // final coord = place.coordinate;
+  // print(
+  //     'The name of my place is $name at ${coord.latitude}, ${coord.longitude}');
+  // final distance = dylib.lookupFunction<DistanceNative, Distance>('distance');
+  // final dist = distance(createCoordinate(2.0, 2.0), createCoordinate(5.0, 6.0));
+  // print("distance between (2,2) and (5,6) = $dist");
 }
