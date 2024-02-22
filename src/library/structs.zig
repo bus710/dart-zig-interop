@@ -9,8 +9,9 @@ const Coordinate = extern struct {
 };
 
 const Place = extern struct {
-    name: [*]const u8,
     coordinate: Coordinate,
+    dummy: [*:0]u8,
+    name: [*:0]u8,
 };
 
 pub fn main() !void {
@@ -82,14 +83,15 @@ export fn create_coordinate(latitude: f64, longitude: f64) callconv(.C) *Coordin
     return &coordinate;
 }
 
-export fn create_place(name: [*]const u8, latitude: f64, longitude: f64) callconv(.C) *Place {
+export fn create_place(dummy: [*:0]u8, name: [*:0]u8, latitude: f64, longitude: f64) callconv(.C) *Place {
     std.debug.print("zig => {any}\n", .{name});
     const printable: [*:0]const u8 = @ptrCast(name);
-    std.debug.print("zig => {s}\n", .{printable});
+    std.debug.print("zig name => {s}\n", .{printable});
 
     var place = Place{
-        .name = name,
         .coordinate = create_coordinate(latitude, longitude).*,
+        .dummy = dummy,
+        .name = name,
     };
 
     return &place;
@@ -102,7 +104,7 @@ export fn distance(c1: Coordinate, c2: Coordinate) f64 {
     return std.math.sqrt(xd * xd + yd * yd);
 }
 
-export fn print_name(name: [*]const u8) callconv(.C) [*:0]u8 {
+export fn print_name(name: [*:0]u8) callconv(.C) [*:0]u8 {
     std.debug.print("zig => {any}\n", .{name});
     const printable: [*:0]const u8 = @ptrCast(name);
     std.debug.print("zig => {s}\n", .{printable});
