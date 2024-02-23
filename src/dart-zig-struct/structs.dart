@@ -48,5 +48,5 @@ void main() {
   final text = data2.ref.Text.toDartString();
   print(text);
   calloc.free(data);
-  calloc.free(data2);
+  // calloc.free(data2);
 }

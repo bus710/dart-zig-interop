@@ -9,13 +9,8 @@ const Coordinate = extern struct {
 };
 
 const Place = extern struct {
-    coordinate: Coordinate,
     name: [*:0]const u8,
-};
-
-const List = extern struct {
     coordinate: Coordinate,
-    list: [*:0]const u8,
 };
 
 pub fn main() !void {
@@ -38,13 +33,17 @@ pub fn main() !void {
     const coord: *Coordinate = create_coordinate(3.5, 4.6);
     std.debug.print("Coordinate is lat {d:.2}, long {d:.2}\n", .{ coord.latitude, coord.longitude });
 
-    const place: *Place = create_place("My Home", 42.0, 24.0);
+    var place_data = Place{
+        .name = "aaa",
+        .coordinate = Coordinate{
+            .latitude = 42.0,
+            .longitude = 24.0,
+        },
+    };
+
+    const place: *Place = create_place(&place_data);
     const printable: [*:0]const u8 = @ptrCast(place.name);
     std.debug.print("The name of my place is {s} at {d:.2}, {d:.2}\n", .{ printable, place.coordinate.latitude, place.coordinate.longitude });
-
-    const list: *List = create_list("My Home2", 42.0, 24.0);
-    const printable2: [*:0]const u8 = @ptrCast(list.list);
-    std.debug.print("The name of my place is {s} at {d:.2}, {d:.2}\n", .{ printable2, place.coordinate.latitude, place.coordinate.longitude });
 
     return;
 }
@@ -61,9 +60,8 @@ export fn hello_world_slice() callconv(.C) [*:0]u8 {
     return @constCast(slice);
 }
 
-//
 fn reverse_zig(input: []const u8) ![:0]u8 {
-    // It seems like you want this to be a NUL-terminated string
+    // To be a NUL-terminated string
     var reversed_str = try allocator.allocSentinel(u8, input.len, 0);
     var i: usize = 0;
     while (i < input.len) : (i += 1) {
@@ -72,7 +70,7 @@ fn reverse_zig(input: []const u8) ![:0]u8 {
     return reversed_str;
 }
 
-/// returns `null` on allocation failure
+/// Returns `null` on allocation failure
 export fn reverse(ptr: [*]const u8, length: u32) callconv(.C) ?[*:0]u8 {
     const slice = ptr[0..length];
     return reverse_zig(slice) catch return null;
@@ -91,28 +89,12 @@ export fn create_coordinate(latitude: f64, longitude: f64) callconv(.C) *Coordin
     return &coordinate;
 }
 
-export fn create_place(name: [*:0]const u8, latitude: f64, longitude: f64) callconv(.C) *Place {
-    std.debug.print("zig => {any}\n", .{name});
-    const printable: [*:0]const u8 = @ptrCast(name);
-    std.debug.print("zig name => {s}\n", .{printable});
+export fn create_place(place: *Place) callconv(.C) *Place {
+    std.debug.print("place.name: {s}\n", .{place.name});
+    std.debug.print("place.coord.lat: {d:.2}\n", .{place.coordinate.latitude});
+    std.debug.print("place.coord.lon: {d:.2}\n", .{place.coordinate.longitude});
 
-    var place = Place{
-        .coordinate = create_coordinate(latitude, longitude).*,
-        .name = name,
-    };
-
-    return &place;
-}
-
-export fn create_list(list: [*:0]const u8, latitude: f64, longitude: f64) callconv(.C) *List {
-    std.debug.print("zig => {any}\n", .{list});
-
-    var _list = List{
-        .coordinate = create_coordinate(latitude, longitude).*,
-        .list = list,
-    };
-
-    return &_list;
+    return place;
 }
 
 export fn distance(c1: Coordinate, c2: Coordinate) f64 {
