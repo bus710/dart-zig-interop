@@ -1,5 +1,5 @@
 name: primitives_ffi
-description: A super simple example of calling C code from Dart with FFI
+description: A super simple example of calling Zig code from Dart with FFI
 
 # This example isn't intended for publishing on pub.dev.
 publish_to: none
