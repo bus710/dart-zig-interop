@@ -49,4 +49,10 @@ $ dart pub get
 $ dart run structs.dart
 ```
 
-
+For the async example:
+```sh
+# Install packages and run the caller
+$ cd src/dart/04-async
+$ dart pub get
+$ dart run async.dart
+```
