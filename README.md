@@ -1,8 +1,5 @@
 # Dart Zig Interop
 
-<br/>
-<br/>
-
 There are some examples for Dart and C FFI:
 - https://dart.dev/interop/c-interop
 - https://github.com/dart-lang/samples/ffi
@@ -14,6 +11,7 @@ Used versions as of Feb 2024:
 - Dart SDK: 3.4.0-00.0.dev (Flutter 3.19.0-0.3.pre)
 - Debian Sid
 
+<br/>
 <br/>
 
 ## How to run
