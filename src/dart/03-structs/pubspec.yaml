@@ -1,7 +1,7 @@
 name: structs_ffi
 version: 0.0.1
 description: >-
-  A super simple example of calling C code from Dart with FFI using structs
+  A super simple example of calling Zig code from Dart with FFI using structs
 
 # This example isn't intended for publishing on pub.dev.
 publish_to: none

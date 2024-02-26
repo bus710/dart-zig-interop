@@ -36,4 +36,8 @@ const LIBRARIES = [_]library{
         .name = "structs",
         .path = "structs.zig",
     },
+    .{
+        .name = "async",
+        .path = "async.zig",
+    },
 };
