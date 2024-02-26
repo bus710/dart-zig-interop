@@ -1,25 +1,20 @@
+// This is not async as a standalone Zig code, but to be used in the Dart async callback demo.
+
 const std = @import("std");
 
-var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-var allocator = gpa.allocator();
-
 pub fn main() !void {
-    // check for leaks
-    defer std.debug.assert(gpa.deinit() == .ok);
-
-    std.debug.print("{s}\n", .{"Hello World - Async"});
-    _ = hello_world_async();
-
+    std.debug.print("{s}\n", .{"Hello from Zig"});
+    _ = hello_world_async(@constCast("string as a param"), callback);
+    std.debug.print("{s}\n", .{"Bye"});
     return;
 }
 
-export fn hello_world_async(input: [*:0]u8, callback: *const fn ([*:0]u8) callconv(.C) void) callconv(.C) void {
-    var i: u8 = 0;
-    const fin: [*:0]const u8 = "Fin";
+fn callback(str: [*:0]u8) callconv(.C) void {
+    std.debug.print("Hello from callback: {s}\n", .{str});
+}
 
-    while (i < 3) : (i = i + 1) {
-        std.time.sleep(std.time.ms_per_s * 100);
-        std.debug.print("{d} - {s}\n", .{ i, input });
-        callback(@constCast(fin));
-    }
+export fn hello_world_async(input: [*:0]u8, _callback: *const fn ([*:0]u8) callconv(.C) void) callconv(.C) void {
+    std.debug.print("zig: {s}\n", .{input});
+    const hello = "string from native function";
+    _callback(@constCast(hello));
 }
