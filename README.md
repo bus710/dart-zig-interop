@@ -1,12 +1,10 @@
 # Dart Zig Interop
 
-There are some examples for Dart and C FFI:
+There are some examples for `Dart-C FFI`, but this repo shows some demo for the `Dart-Zig FFI`.
 - https://dart.dev/interop/c-interop
 - https://github.com/dart-lang/samples/ffi
 
-This repo repeats the same as the Dart-C FFI examples, but for the Dart-Zig FFI.
-
-Used versions as of Feb 2024:
+Used those versions as of Feb 2024:
 - Zig SDK: 0.12.0-dev.2250
 - Dart SDK: 3.4.0-00.0.dev (Flutter 3.19.0-0.3.pre)
 - Debian Sid
