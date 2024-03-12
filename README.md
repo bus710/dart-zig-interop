@@ -60,4 +60,33 @@ $ dart run async.dart
 
 ## How to run the automatic FFI demos
 
-TBD
+To build all the Zig libraries:
+```sh
+# Build the library
+$ cd src-ffigen/library
+$ zig build --summary all
+```
+
+Manually update the header files:
+```sh
+$ nv src-ffigen/library/zig-cache/hello.h
+$ mv src-ffigen/library/zig-cache/hello.h src-ffigen/dart/01-hello-world
+```
+
+Update the `pubspec.yaml`:
+```sh
+$ nv src-ffigen/app/01-hello-world/pubspec.yaml
+```
+
+Generate the ffi file:
+```sh
+$ cd src-ffigen/app/01-hello-world
+$ dart run ffigen
+```
+
+Run the demo:
+```sh
+$ dart run hello.dart
+```
+
+:warning: the async demo doesn't work with the ffigen command, but other 3 demos work well.

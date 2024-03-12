@@ -14,5 +14,16 @@ dependencies:
   path: ^1.9.0
 
 dev_dependencies:
+  ffigen: ^11.0.0
   lints: ^3.0.0
   test: ^1.25.0
+
+ffigen:
+  name: 'Structs'
+  description: 'Some external code from Zig'
+  output: 'generated_bindings.dart'
+  llvm-path: 
+    - /usr/lib/llvm-16
+  headers:
+    entry-points:
+      - 'structs.h'
