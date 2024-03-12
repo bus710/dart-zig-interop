@@ -8,9 +8,14 @@ Used those versions as of Feb 2024:
 - Debian Sid
 
 <br/>
+
+There are 2 different ways:
+- Manual FFI (under the src directory)
+- Automatic FFI with the ffigen command (under the src-ffigen directory)
+
 <br/>
 
-## How to run
+## How to run the manual FFI demos
 
 To build all the Zig libraries:
 ```sh
@@ -50,3 +55,9 @@ $ cd src/dart/04-async
 $ dart pub get
 $ dart run async.dart
 ```
+
+<br/>
+
+## How to run the automatic FFI demos
+
+TBD
